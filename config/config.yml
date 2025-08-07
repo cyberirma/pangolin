@@ -10,7 +10,7 @@ server:
   secret: "rG7#xN8!sY2@LqP4$eR9&UkM1*WdC6^Zf"
 
 gerbil:
-  base_endpoint: "pang-api.irma-prod.net"
+  base_endpoint: "pangolin.irma-prod.net"
 
 flags:
   require_email_verification: false
