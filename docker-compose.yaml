@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   pangolin:
     image: fosrl/pangolin:latest
@@ -32,7 +30,7 @@ services:
       - --remoteConfig=http://pangolin:3001/api/v1/gerbil/get-config
       - --reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth
     volumes:
-      - pangolin_config:/var/config
+      - ./config/:/var/config   # <-- use same host config directory!
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -43,7 +41,7 @@ services:
       - "3002"
 
 volumes:
-  pangolin_config:
+  # pangolin_config:  <-- REMOVE this named volume, it's not needed here
 
 networks:
   default:
