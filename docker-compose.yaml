@@ -3,23 +3,25 @@ version: "3.8"
 services:
   pangolin:
     image: fosrl/pangolin:latest
-    container_name: pangolin
     restart: unless-stopped
     volumes:
-      - ./config:/app/config
+      - pangolin_config:/app/config
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/"]
-      interval: "3s"
-      timeout: "3s"
-      retries: 15
+      test: ["CMD-SHELL", "curl -f http://localhost:3001/api/v1/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - ENVIRONMENT=prod
       - DB_TYPE=sqlite
+    expose:
+      - "3000"
+      - "3001"
+      - "3002"
 
   gerbil:
     image: fosrl/gerbil:latest
-    container_name: gerbil
     restart: unless-stopped
     depends_on:
       pangolin:
@@ -30,7 +32,7 @@ services:
       - --remoteConfig=http://pangolin:3001/api/v1/gerbil/get-config
       - --reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth
     volumes:
-      - ./config:/var/config
+      - pangolin_config:/var/config
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -39,7 +41,9 @@ services:
       - "3000"
       - "3001"
       - "3002"
-    # Remove public ports since Coolify handles proxying
+
+volumes:
+  pangolin_config:
 
 networks:
   default:
