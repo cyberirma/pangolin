@@ -1,39 +1,81 @@
 services:
   pangolin:
-    image: fosrl/pangolin:latest  # https://github.com/fosrl/pangolin/releases
-    container_name: pangolin
+    image: 'fosrl/pangolin:latest'
+    container_name: pangolin-bo8kw0k84cooo8socgswgw8s-162312254603
     restart: unless-stopped
     volumes:
-      - ./config:/app/config
+      - '/data/coolify/applications/bo8kw0k84cooo8socgswgw8s/config:/app/config'
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/"]
-      interval: "3s"
-      timeout: "3s"
+      interval: 3s
+      timeout: 3s
       retries: 15
+    labels:
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.420.6
+      - coolify.applicationId=9
+      - coolify.type=application
+      - coolify.name=pangolin-bo8kw0k84cooo8socgswgw8s-162312254603
+      - coolify.resourceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.projectName=sec
+      - coolify.serviceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.environmentName=production
+      - coolify.pullRequestId=0
+
+      # Traefik proxy labels
+      - traefik.enable=true
+      - "traefik.http.routers.pangolin-api.rule=Host(`pangolin.irma-prod.net`) && PathPrefix(`/api/v1`)"
+      - traefik.http.routers.pangolin-api.entrypoints=http
+      - traefik.http.services.pangolin-api.loadbalancer.server.port=3001
+
+    networks:
+      bo8kw0k84cooo8socgswgw8s: null
+    environment:
+      COOLIFY_BRANCH: '"main"'
+      COOLIFY_RESOURCE_UUID: bo8kw0k84cooo8socgswgw8s
+      COOLIFY_CONTAINER_NAME: pangolin-bo8kw0k84cooo8socgswgw8s-162312254603
 
   gerbil:
-    image: fosrl/gerbil:latest # https://github.com/fosrl/gerbil/releases
-    container_name: gerbil
+    image: 'fosrl/gerbil:latest'
+    container_name: gerbil-bo8kw0k84cooo8socgswgw8s-162312272394
     restart: unless-stopped
     depends_on:
       pangolin:
         condition: service_healthy
     command:
-      - --reachableAt=http://gerbil:3003
-      - --generateAndSaveKeyTo=/var/config/key
-      - --remoteConfig=http://pangolin:3001/api/v1/gerbil/get-config
-      - --reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth
+      - '--reachableAt=http://gerbil:3003'
+      - '--generateAndSaveKeyTo=/var/config/key'
+      - '--remoteConfig=http://pangolin:3001/api/v1/gerbil/get-config'
+      - '--reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth'
     volumes:
-      - ./config/:/var/config
+      - '/data/coolify/applications/bo8kw0k84cooo8socgswgw8s/config:/var/config'
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
     ports:
-      - 51820:51820/udp
-
-
+      - '51820:51820/udp'
+    labels:
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.420.6
+      - coolify.applicationId=9
+      - coolify.type=application
+      - coolify.name=gerbil-bo8kw0k84cooo8socgswgw8s-162312272394
+      - coolify.resourceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.projectName=sec
+      - coolify.serviceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.environmentName=production
+      - coolify.pullRequestId=0
+    networks:
+      bo8kw0k84cooo8socgswgw8s: null
+    environment:
+      COOLIFY_BRANCH: '"main"'
+      COOLIFY_RESOURCE_UUID: bo8kw0k84cooo8socgswgw8s
+      COOLIFY_CONTAINER_NAME: gerbil-bo8kw0k84cooo8socgswgw8s-162312272394
 
 networks:
   default:
     driver: bridge
     name: pangolin
+  bo8kw0k84cooo8socgswgw8s:
+    name: bo8kw0k84cooo8socgswgw8s
+    external: true
