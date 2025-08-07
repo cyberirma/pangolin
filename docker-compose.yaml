@@ -3,7 +3,7 @@ services:
     image: fosrl/pangolin:latest
     restart: unless-stopped
     volumes:
-      - ./config/:/app/config
+      - ./config:/app/config
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3001/api/v1/ || exit 1"]
       interval: 10s
@@ -30,7 +30,7 @@ services:
       - --remoteConfig=http://pangolin:3001/api/v1/gerbil/get-config
       - --reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth
     volumes:
-      - ./config/:/var/config   # <-- use same host config directory!
+      - ./config:/var/config   # <-- use same host config directory!
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
