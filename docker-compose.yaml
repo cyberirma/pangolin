@@ -1,25 +1,19 @@
 services:
   pangolin:
-    image: fosrl/pangolin:latest
+    image: fosrl/pangolin:latest # https://github.com/fosrl/pangolin/releases
+    container_name: pangolin
     restart: unless-stopped
     volumes:
       - ./config:/app/config
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3001/api/v1/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 20
-    environment:
-      - NODE_ENV=production
-      - ENVIRONMENT=prod
-      - DB_TYPE=sqlite
-    expose:
-      - "3000"
-      - "3001"
-      - "3002"
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/"]
+      interval: "3s"
+      timeout: "3s"
+      retries: 15
 
   gerbil:
-    image: fosrl/gerbil:latest
+    image: fosrl/gerbil:latest # https://github.com/fosrl/gerbil/releases
+    container_name: gerbil
     restart: unless-stopped
     depends_on:
       pangolin:
@@ -30,18 +24,14 @@ services:
       - --remoteConfig=http://pangolin:3001/api/v1/gerbil/get-config
       - --reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth
     volumes:
-      - ./config:/var/config   # <-- use same host config directory!
+      - ./config/:/var/config
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
-    expose:
-      - "3003"
-      - "3000"
-      - "3001"
-      - "3002"
+    ports:
+      - 51820:51820/udp
 
-volumes:
-  # pangolin_config:  <-- REMOVE this named volume, it's not needed here
+
 
 networks:
   default:
