@@ -1,5 +1,5 @@
 app:
-  dashboard_url: "https://pangolin.irma-prod.net"
+  dashboard_url: "https://pango-api.irma-prod.net"
 
 domains:
   domain1:
@@ -12,7 +12,7 @@ server:
   secret: "rG7#xN8!sY2@LqP4$eR9&UkM1*WdC6^Zf"
 
 gerbil:
-  base_endpoint: "eoog0wo8kc0os0oc0k084osw.irma-prod.net"
+  base_endpoint: "pang-api.irma-prod.net"
 
 flags:
   require_email_verification: false
