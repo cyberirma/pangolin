@@ -1,49 +1,96 @@
-version: "3.8"
-
 services:
   pangolin:
-    image: fosrl/pangolin:latest
-    container_name: pangolin
+    image: 'fosrl/pangolin:latest'
+    container_name: pangolin-bo8kw0k84cooo8socgswgw8s-164531549714
     restart: unless-stopped
     volumes:
-      - ./config:/app/config
+      - '/data/coolify/applications/bo8kw0k84cooo8socgswgw8s/config:/app/config'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/"]
+      test:
+        - CMD
+        - curl
+        - '-f'
+        - 'http://localhost:3001/api/v1/'
       interval: 3s
       timeout: 3s
       retries: 15
     networks:
-      - pangolin
+      pangolin: null
+      bo8kw0k84cooo8socgswgw8s: null
     labels:
-      
-    - traefik.enable=true
-    - "traefik.http.routers.pangolin.rule=Host(`pangolin.irma-prod.net`)"
-    - traefik.http.services.pangolin.loadbalancer.server.port=3001
-    - traefik.http.routers.pangolin.entrypoints=http
+      - traefik.enable=true
 
+      # Router for API path /api/v1
+      - traefik.http.routers.pangolin-api.rule=Host(`pangolin.irma-prod.net`) && PathPrefix(`/api/v1`)
+      - traefik.http.routers.pangolin-api.entrypoints=http
+      - traefik.http.services.pangolin-api.loadbalancer.server.port=3001
+
+      # Router for UI (root path but not /api/v1)
+      - traefik.http.routers.pangolin-ui.rule=Host(`pangolin.irma-prod.net`) && PathPrefix(`/`) && !PathPrefix(`/api/v1`)
+      - traefik.http.routers.pangolin-ui.entrypoints=http
+      - traefik.http.services.pangolin-ui.loadbalancer.server.port=3002
+
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.420.6
+      - coolify.applicationId=9
+      - coolify.type=application
+      - coolify.name=pangolin-bo8kw0k84cooo8socgswgw8s-164531549714
+      - coolify.resourceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.projectName=sec
+      - coolify.serviceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.environmentName=production
+      - coolify.pullRequestId=0
+    environment:
+      COOLIFY_BRANCH: '"main"'
+      COOLIFY_RESOURCE_UUID: bo8kw0k84cooo8socgswgw8s
+      COOLIFY_CONTAINER_NAME: pangolin-bo8kw0k84cooo8socgswgw8s-164531549714
 
   gerbil:
-    image: fosrl/gerbil:latest
-    container_name: gerbil
+    image: 'fosrl/gerbil:latest'
+    container_name: gerbil-bo8kw0k84cooo8socgswgw8s-164531567497
     restart: unless-stopped
     depends_on:
       pangolin:
         condition: service_healthy
     command:
-      - --reachableAt=http://gerbil:3003
-      - --generateAndSaveKeyTo=/var/config/key
-      - --remoteConfig=http://pangolin:3001/api/v1/gerbil/get-config
-      - --reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth
+      - '--reachableAt=http://gerbil:3003'
+      - '--generateAndSaveKeyTo=/var/config/key'
+      - '--remoteConfig=http://pangolin:3001/api/v1/gerbil/get-config'
+      - '--reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth'
     volumes:
-      - ./config:/var/config
+      - '/data/coolify/applications/bo8kw0k84cooo8socgswgw8s/config:/var/config'
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
     ports:
-      - 51820:51820/udp
+      - '51820:51820/udp'
     networks:
-      - pangolin
+      pangolin: null
+      bo8kw0k84cooo8socgswgw8s: null
+    labels:
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.420.6
+      - coolify.applicationId=9
+      - coolify.type=application
+      - coolify.name=gerbil-bo8kw0k84cooo8socgswgw8s-164531567497
+      - coolify.resourceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.projectName=sec
+      - coolify.serviceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.environmentName=production
+      - coolify.pullRequestId=0
+    environment:
+      COOLIFY_BRANCH: '"main"'
+      COOLIFY_RESOURCE_UUID: bo8kw0k84cooo8socgswgw8s
+      COOLIFY_CONTAINER_NAME: gerbil-bo8kw0k84cooo8socgswgw8s-164531567497
+
+volumes: {  }
 
 networks:
   pangolin:
     driver: bridge
+  bo8kw0k84cooo8socgswgw8s:
+    name: bo8kw0k84cooo8socgswgw8s
+    external: true
+
+configs: {  }
+secrets: {  }
