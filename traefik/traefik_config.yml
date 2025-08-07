@@ -30,7 +30,7 @@ certificatesResolvers:
 
 entryPoints:
   web:
-    address: ":8080"
+    address: ":8000"
   websecure:
     address: ":8443"
     transport:
