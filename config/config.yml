@@ -1,5 +1,5 @@
 app:
-  dashboard_url: "https://pango-api.irma-prod.net"
+  dashboard_url: "https://pang-api.irma-prod.net"
 
 domains:
   domain1:
