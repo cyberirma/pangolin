@@ -1,5 +1,5 @@
 app:
-  dashboard_url: "http://pangolin.irma-prod.net"
+  dashboard_url: "https://pangolin.irma-prod.net"
 
 domains:
   domain1:
