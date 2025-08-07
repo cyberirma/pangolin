@@ -1,39 +1,119 @@
 services:
   pangolin:
-    image: fosrl/pangolin:latest  # https://github.com/fosrl/pangolin/releases
-    container_name: pangolin
+    image: 'fosrl/pangolin:latest'
+    container_name: pangolin-bo8kw0k84cooo8socgswgw8s-165205328759
     restart: unless-stopped
     volumes:
-      - ./config:/app/config
+      - '/data/coolify/applications/bo8kw0k84cooo8socgswgw8s/config:/app/config'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/"]
-      interval: "3s"
-      timeout: "3s"
+      test:
+        - CMD
+        - curl
+        - '-f'
+        - 'http://localhost:3001/api/v1/'
+      interval: 3s
+      timeout: 3s
       retries: 15
-
+    labels:
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.420.6
+      - coolify.applicationId=9
+      - coolify.type=application
+      - coolify.name=pangolin-bo8kw0k84cooo8socgswgw8s-165205328759
+      - coolify.resourceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.projectName=sec
+      - coolify.serviceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.environmentName=production
+      - coolify.pullRequestId=0
+      - traefik.enable=true
+      - traefik.http.middlewares.gzip.compress=true
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      # Router for the main application traffic
+      - traefik.http.routers.http-0-bo8kw0k84cooo8socgswgw8s-pangolin.entryPoints=http
+      - traefik.http.routers.http-0-bo8kw0k84cooo8socgswgw8s-pangolin.middlewares=redirect-to-https
+      # We remove the PathPrefix rule to avoid conflicts with the new API router
+      - 'traefik.http.routers.http-0-bo8kw0k84cooo8socgswgw8s-pangolin.rule=Host(`pangolin.irma-prod.net`)'
+      - traefik.http.routers.http-0-bo8kw0k84cooo8socgswgw8s-pangolin.service=http-0-bo8kw0k84cooo8socgswgw8s-pangolin
+      - traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.entryPoints=https
+      - traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.middlewares=gzip
+      # We remove the PathPrefix rule here as well
+      - 'traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.rule=Host(`pangolin.irma-prod.net`)'
+      - traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.service=https-0-bo8kw0k84cooo8socgswgw8s-pangolin
+      - traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.tls.certresolver=letsencrypt
+      - traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.tls=true
+      # New router for the API traffic
+      - traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin-api.entryPoints=https
+      - 'traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin-api.rule=Host(`pangolin.irma-prod.net`) && PathPrefix(`/api/v1`)'
+      - traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin-api.service=https-0-bo8kw0k84cooo8socgswgw8s-pangolin-api
+      # New service that points to the API port 3001
+      - traefik.http.services.https-0-bo8kw0k84cooo8socgswgw8s-pangolin-api.loadbalancer.server.port=3001
+      # Existing services for the main app on port 3002
+      - traefik.http.services.http-0-bo8kw0k84cooo8socgswgw8s-pangolin.loadbalancer.server.port=3002
+      - traefik.http.services.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.loadbalancer.server.port=3002
+      - 'caddy_0.encode=zstd gzip'
+      - 'caddy_0.handle_path.0_reverse_proxy={{upstreams 3002}}'
+      - 'caddy_0.handle_path=/*'
+      - caddy_0.header=-Server
+      - 'caddy_0.try_files={path} /index.html /index.php'
+      - 'caddy_0=https://pangolin.irma-prod.net'
+      - caddy_ingress_network=bo8kw0k84cooo8socgswgw8s
+    networks:
+      bo8kw0k84cooo8socgswgw8s: null
+    environment:
+      COOLIFY_BRANCH: '"main"'
+      COOLIFY_RESOURCE_UUID: bo8kw0k84cooo8socgswgw8s
+      COOLIFY_CONTAINER_NAME: pangolin-bo8kw0k84cooo8socgswgw8s-165205328759
+      SERVICE_URL_PANGOLIN: 'https://pangolin.irma-prod.net'
+      SERVICE_FQDN_PANGOLIN: pangolin.irma-prod.net
+      COOLIFY_URL: 'https://pangolin.irma-prod.net'
+      COOLIFY_FQDN: pangolin.irma-prod.net
   gerbil:
-    image: fosrl/gerbil:latest # https://github.com/fosrl/gerbil/releases
-    container_name: gerbil
+    image: 'fosrl/gerbil:latest'
+    container_name: gerbil-bo8kw0k84cooo8socgswgw8s-165205356821
     restart: unless-stopped
     depends_on:
       pangolin:
         condition: service_healthy
     command:
-      - --reachableAt=http://gerbil:3003
-      - --generateAndSaveKeyTo=/var/config/key
-      - --remoteConfig=http://pangolin:3001/api/v1/gerbil/get-config
-      - --reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth
+      - '--reachableAt=http://gerbil:3003'
+      - '--generateAndSaveKeyTo=/var/config/key'
+      # Corrected URL to specify the API port
+      - '--remoteConfig=http://pangolin:3001/api/v1/gerbil/get-config'
+      # Corrected URL to specify the API port
+      - '--reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth'
     volumes:
-      - ./config/:/var/config
+      - '/data/coolify/applications/bo8kw0k84cooo8socgswgw8s/config:/var/config'
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
     ports:
-      - 51820:51820/udp
-
-
-
+      - '51820:51820/udp'
+    labels:
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.420.6
+      - coolify.applicationId=9
+      - coolify.type=application
+      - coolify.name=gerbil-bo8kw0k84cooo8socgswgw8s-165205356821
+      - coolify.resourceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.projectName=sec
+      - coolify.serviceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.environmentName=production
+      - coolify.pullRequestId=0
+    networks:
+      bo8kw0k84cooo8socgswgw8s: null
+    environment:
+      COOLIFY_BRANCH: '"main"'
+      COOLIFY_RESOURCE_UUID: bo8kw0k84cooo8socgswgw8s
+      COOLIFY_CONTAINER_NAME: gerbil-bo8kw0k84cooo8socgswgw8s-165205356821
+      SERVICE_URL_PANGOLIN: 'https://pangolin.irma-prod.net'
+      SERVICE_FQDN_PANGOLIN: pangolin.irma-prod.net
+volumes: {}
 networks:
   default:
     driver: bridge
     name: pangolin
+  bo8kw0k84cooo8socgswgw8s:
+    name: bo8kw0k84cooo8socgswgw8s
+    external: true
+configs: {}
+secrets: {}
