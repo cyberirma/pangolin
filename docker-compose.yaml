@@ -31,13 +31,13 @@ services:
       # Router for the main application traffic
       - traefik.http.routers.http-0-bo8kw0k84cooo8socgswgw8s-pangolin.entryPoints=http
       - traefik.http.routers.http-0-bo8kw0k84cooo8socgswgw8s-pangolin.middlewares=redirect-to-https
-      # We remove the PathPrefix rule to avoid conflicts with the new API router
-      - 'traefik.http.routers.http-0-bo8kw0k84cooo8socgswgw8s-pangolin.rule=Host(`pangolin.irma-prod.net`)'
+      # Re-adding PathPrefix(`/`) to ensure this router only handles the root path
+      - 'traefik.http.routers.http-0-bo8kw0k84cooo8socgswgw8s-pangolin.rule=Host(`pangolin.irma-prod.net`) && PathPrefix(`/`)'
       - traefik.http.routers.http-0-bo8kw0k84cooo8socgswgw8s-pangolin.service=http-0-bo8kw0k84cooo8socgswgw8s-pangolin
       - traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.entryPoints=https
       - traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.middlewares=gzip
-      # We remove the PathPrefix rule here as well
-      - 'traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.rule=Host(`pangolin.irma-prod.net`)'
+      # Re-adding PathPrefix(`/`) to ensure this router only handles the root path
+      - 'traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.rule=Host(`pangolin.irma-prod.net`) && PathPrefix(`/`)'
       - traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.service=https-0-bo8kw0k84cooo8socgswgw8s-pangolin
       - traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.tls.certresolver=letsencrypt
       - traefik.http.routers.https-0-bo8kw0k84cooo8socgswgw8s-pangolin.tls=true
