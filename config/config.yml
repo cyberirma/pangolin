@@ -1,0 +1,18 @@
+app:
+  dashboard_url: "https://pangolin.irma-prod.net"
+
+domains:
+  domain1:
+    base_domain: "pangolin.irma-prod.net"
+    cert_resolver: "letsencrypt"
+
+server:
+  secret: "yoursdsdsdsdsdsdsdsd67767767"
+
+gerbil:
+  base_endpoint: "pangolin.irma-prod.net"
+
+flags:
+  require_email_verification: false
+  disable_signup_without_invite: true
+  disable_user_create_org: true
