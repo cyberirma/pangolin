@@ -7,7 +7,7 @@ domains:
     cert_resolver: "letsencrypt"
 
 server:
-  secret: "yoursdsdsdsdsdsdsdsd67767767"
+  secret: "rG7#xN8!sY2@LqP4$eR9&UkM1*WdC6^Zf"
 
 gerbil:
   base_endpoint: "pangolin.irma-prod.net"
