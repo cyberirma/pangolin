@@ -11,6 +11,9 @@ services:
       timeout: "3s"
       retries: 15
     labels:
+    - coolify.managed=true
+    - coolify.applicationId=9
+    - coolify.type=application
     - traefik.enable=true
 
     # Redirect HTTP to HTTPS
