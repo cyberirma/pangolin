@@ -10,35 +10,7 @@ services:
       interval: "3s"
       timeout: "3s"
       retries: 15
-    labels:
-    - coolify.managed=true
-    - coolify.applicationId=9
-    - coolify.type=application
-    - traefik.enable=true
-
-    # Redirect HTTP to HTTPS
-    - traefik.http.routers.pangolin-http.rule=Host(`pangolin.irma-prod.net`)
-    - traefik.http.routers.pangolin-http.entrypoints=http
-    - traefik.http.routers.pangolin-http.middlewares=redirect-to-https
-
-    - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
-
-    # HTTPS router for UI (everything except /api)
-    - traefik.http.routers.pangolin-ui.rule=Host(`pangolin.irma-prod.net`) && PathPrefix(`/`)
-    - traefik.http.routers.pangolin-ui.entrypoints=https
-    - traefik.http.routers.pangolin-ui.tls.certresolver=letsencrypt
-    - traefik.http.routers.pangolin-ui.service=pangolin-ui
-
-    - traefik.http.services.pangolin-ui.loadbalancer.server.port=3002
-
-    # HTTPS router for API
-    - traefik.http.routers.pangolin-api.rule=Host(`pangolin.irma-prod.net`) && PathPrefix(`/api`)
-    - traefik.http.routers.pangolin-api.entrypoints=https
-    - traefik.http.routers.pangolin-api.tls.certresolver=letsencrypt
-    - traefik.http.routers.pangolin-api.service=pangolin-api
-
-    - traefik.http.services.pangolin-api.loadbalancer.server.port=3001
-
+  
   gerbil:
     image: fosrl/gerbil:latest # https://github.com/fosrl/gerbil/releases
     container_name: gerbil
