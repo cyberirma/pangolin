@@ -45,19 +45,20 @@ services:
       - traefik.http.routers.pangolin-ui.tls=true
       - traefik.http.routers.pangolin-ui.tls.certresolver=letsencrypt
       - traefik.http.routers.pangolin-ui.service=pangolin-ui
+    # Middleware to strip /api prefix
+      - traefik.http.middlewares.strip-api.stripprefix.prefixes=/api
 
-      # Router for API - all /api and subpaths go to port 3001 with prefix stripped
+      # API router
       - traefik.http.routers.pangolin-api.rule=Host(`pangolin.irma-prod.net`) && PathPrefix(`/api`)
       - traefik.http.routers.pangolin-api.entrypoints=http,https
       - traefik.http.routers.pangolin-api.middlewares=strip-api,gzip
       - traefik.http.routers.pangolin-api.tls=true
       - traefik.http.routers.pangolin-api.tls.certresolver=letsencrypt
       - traefik.http.routers.pangolin-api.service=pangolin-api
-
       ### Services ###
 
       - traefik.http.services.pangolin-ui.loadbalancer.server.port=3002
-      - traefik.http.services.pangolin-api.loadbalancer.server.port=3001
+       - traefik.http.services.pangolin-api.loadbalancer.server.port=3001
 
     networks:
       - bo8kw0k84cooo8socgswgw8s
