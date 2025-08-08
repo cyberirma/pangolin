@@ -1,39 +1,120 @@
 services:
+
   pangolin:
-    image: fosrl/pangolin:latest  # https://github.com/fosrl/pangolin/releases
-    container_name: pangolin
+    image: 'fosrl/pangolin:latest'
+    container_name: pangolin-bo8kw0k84cooo8socgswgw8s-163904642561
     restart: unless-stopped
     volumes:
-      - ./config:/app/config
+      - '/data/coolify/applications/bo8kw0k84cooo8socgswgw8s/config:/app/config'
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/api/v1/"]
-      interval: "3s"
-      timeout: "3s"
+      test:
+        - CMD
+        - curl
+        - '-f'
+        - 'http://localhost:3001/api/v1/'
+      interval: 3s
+      timeout: 3s
       retries: 15
-  
+    labels:
+      - coolify.managed=true
+      - coolify.version=4.0.0-beta.420.6
+      - coolify.applicationId=9
+      - coolify.type=application
+      - coolify.name=pangolin-bo8kw0k84cooo8socgswgw8s-163904642561
+      - coolify.resourceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.projectName=sec
+      - coolify.serviceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+      - coolify.environmentName=production
+      - coolify.pullRequestId=0
+      - traefik.enable=true
+
+      # Middleware to gzip compress
+      - traefik.http.middlewares.gzip.compress=true
+
+      # Middleware to strip /api prefix before forwarding to API service
+      - traefik.http.middlewares.strip-api.stripprefix.prefixes=/api
+
+      # Middleware to redirect http to https
+      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+
+      ### Routers ###
+
+      # Router for UI - all traffic except /api goes to port 3002
+      - traefik.http.routers.pangolin-ui.rule=Host(`pangolin.irma-prod.net`) && (PathPrefix(`/`) && !PathPrefix(`/api`))
+      - traefik.http.routers.pangolin-ui.entrypoints=http,https
+      - traefik.http.routers.pangolin-ui.tls=true
+      - traefik.http.routers.pangolin-ui.tls.certresolver=letsencrypt
+      - traefik.http.routers.pangolin-ui.service=pangolin-ui
+
+      # Router for API - all /api and subpaths go to port 3001 with prefix stripped
+      - traefik.http.routers.pangolin-api.rule=Host(`pangolin.irma-prod.net`) && PathPrefix(`/api`)
+      - traefik.http.routers.pangolin-api.entrypoints=http,https
+      - traefik.http.routers.pangolin-api.middlewares=strip-api,gzip
+      - traefik.http.routers.pangolin-api.tls=true
+      - traefik.http.routers.pangolin-api.tls.certresolver=letsencrypt
+      - traefik.http.routers.pangolin-api.service=pangolin-api
+
+      ### Services ###
+
+      - traefik.http.services.pangolin-ui.loadbalancer.server.port=3002
+      - traefik.http.services.pangolin-api.loadbalancer.server.port=3001
+
+    networks:
+      bo8kw0k84cooo8socgswgw8s: null
+    environment:
+      COOLIFY_BRANCH: '"main"'
+      COOLIFY_RESOURCE_UUID: bo8kw0k84cooo8socgswgw8s
+      COOLIFY_CONTAINER_NAME: pangolin-bo8kw0k84cooo8socgswgw8s-163904642561
+      SERVICE_URL_PANGOLIN: 'https://pangolin.irma-prod.net'
+      SERVICE_FQDN_PANGOLIN: pangolin.irma-prod.net
+      COOLIFY_URL: 'https://pangolin.irma-prod.net,https://pangolin.irma-prod.net/api'
+      COOLIFY_FQDN: 'pangolin.irma-prod.net,pangolin.irma-prod.net/api'
+
   gerbil:
-    image: fosrl/gerbil:latest # https://github.com/fosrl/gerbil/releases
-    container_name: gerbil
-    restart: unless-stopped
-    depends_on:
-      pangolin:
-        condition: service_healthy
-    command:
-      - --reachableAt=http://gerbil:3003
-      - --generateAndSaveKeyTo=/var/config/key
-      - --remoteConfig=http://pangolin:3001/api/v1/gerbil/get-config
-      - --reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth
-    volumes:
-      - ./config/:/var/config
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    ports:
-      - 51820:51820/udp
-
-
-
-networks:
-  default:
-    driver: bridge
-    name: pangolin
+      image: 'fosrl/gerbil:latest'
+      container_name: gerbil-bo8kw0k84cooo8socgswgw8s-163904661124
+      restart: unless-stopped
+      depends_on:
+        pangolin:
+          condition: service_healthy
+      command:
+        - '--reachableAt=http://gerbil:3003'
+        - '--generateAndSaveKeyTo=/var/config/key'
+        - '--remoteConfig=http://pangolin:3001/api/v1/gerbil/get-config'
+        - '--reportBandwidthTo=http://pangolin:3001/api/v1/gerbil/receive-bandwidth'
+      volumes:
+        - '/data/coolify/applications/bo8kw0k84cooo8socgswgw8s/config:/var/config'
+      cap_add:
+        - NET_ADMIN
+        - SYS_MODULE
+      ports:
+        - '51820:51820/udp'
+      labels:
+        - coolify.managed=true
+        - coolify.version=4.0.0-beta.420.6
+        - coolify.applicationId=9
+        - coolify.type=application
+        - coolify.name=gerbil-bo8kw0k84cooo8socgswgw8s-163904661124
+        - coolify.resourceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+        - coolify.projectName=sec
+        - coolify.serviceName=cyberirmapangolinmain-pockcscoc4kkcccosk4oco8c
+        - coolify.environmentName=production
+        - coolify.pullRequestId=0
+      networks:
+        bo8kw0k84cooo8socgswgw8s: null
+      environment:
+        COOLIFY_BRANCH: '"main"'
+        COOLIFY_RESOURCE_UUID: bo8kw0k84cooo8socgswgw8s
+        COOLIFY_CONTAINER_NAME: gerbil-bo8kw0k84cooo8socgswgw8s-163904661124
+        SERVICE_URL_PANGOLIN: 'https://pangolin.irma-prod.net'
+        SERVICE_FQDN_PANGOLIN: pangolin.irma-prod.net
+  volumes: {  }
+  networks:
+    default:
+      driver: bridge
+      name: pangolin
+    bo8kw0k84cooo8socgswgw8s:
+      name: bo8kw0k84cooo8socgswgw8s
+      external: true
+  configs: {  }
+  secrets: {  }
