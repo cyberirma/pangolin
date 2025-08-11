@@ -3,6 +3,8 @@ services:
     image: fosrl/pangolin:latest
     container_name: pangolin
     restart: always
+    networks:
+      - coolify
     volumes:
       - ./config:/app/config
     environment:
@@ -53,6 +55,6 @@ services:
       - NET_ADMIN
       - SYS_MODULE
 
-
-  
-
+networks:
+  coolify:
+    external: true
